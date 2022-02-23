@@ -41,8 +41,11 @@ function formSubmitHandler(event) {
   event.preventDefault();
   var userName = userformEl.querySelector("#username").value.trim();
   if (userName) {
-    getUserRepos(userName);
+    repoSearchTerm.textContent = "";
     userformEl.querySelector("#username").value = "";
+    repoContainerEl.innerHTML = "";
+
+    getUserRepos(userName);
   } else {
     alert("please enter a valid name");
   }
@@ -51,8 +54,12 @@ function formSubmitHandler(event) {
 userformEl.addEventListener("submit", formSubmitHandler);
 
 var displayRepos = function (repos, searchTerm) {
-  // clear old content
-  repoContainerEl.textContent = "";
+  // check if api returned any repos
+  if (repos.length === 0) {
+    repoContainerEl.textContent = "No repositories found.";
+    return;
+  }
+
   repoSearchTerm.textContent = searchTerm;
 
   // loop over repos
@@ -87,11 +94,5 @@ var displayRepos = function (repos, searchTerm) {
 
     // append container to the dom
     repoContainerEl.appendChild(repoEl);
-  }
-
-  // check if api returned any repos
-  if (repos.length === 0) {
-    repoContainerEl.textContent = "No repositories found.";
-    return;
   }
 };
