@@ -1,12 +1,13 @@
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
 var getRepoIssues = function (repo) {
-  var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
+  var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=30";
   fetch(apiUrl)
     .then(function (response) {
       if (response.ok) {
+        // console.log(response);
         response.json().then(function (data) {
-    
           // pass response data to dom function
           displayIssues(data);
 
@@ -16,7 +17,9 @@ var getRepoIssues = function (repo) {
           }
         });
       } else {
-        alert("There was a problem with your request!");
+        // if not successful, redirect to homepage
+        console.log(response);
+        document.location.replace("./index.html");
       }
     })
     .catch(function (error) {
@@ -24,7 +27,20 @@ var getRepoIssues = function (repo) {
     });
 };
 
-getRepoIssues("angular/angular");
+function getRepoName() {
+  // grab repo name from url query string
+  var queryString = document.location.search;
+  var repoName = queryString.split("=")[1];
+  if (repoName) {
+    getRepoIssues(repoName);
+    repoNameEl.textContent = repoName;
+  } else {
+    // if not successful, redirect to homepage
+    document.location.replace("./index.html");
+  }
+}
+
+getRepoName();
 
 var displayIssues = function (issues) {
   if (issues.length === 0) {
@@ -53,7 +69,7 @@ var displayIssues = function (issues) {
     if (issues[i].pull_request) {
       typeEl.textContent = "(Pull request)";
     } else {
-      typeEl.textContent = "(Issue)";
+      typeEl.textContent = issues[i].created_at + " (Issue)";
     }
 
     // append to container
